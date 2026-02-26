@@ -1,1003 +1,625 @@
-/* ===================================================
-   ENGLISH ADVENTURE — Main Stylesheet
-   Target: Children 8-12 | A1-A2 Level
-   =================================================== */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English Adventure! 🌟 Learn English A1–A2</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+</head>
+<body>
 
-/* --- CSS Variables --- */
-:root {
-  --blue: #3B82F6;
-  --blue-light: #DBEAFE;
-  --blue-dark: #1D4ED8;
-  --green: #22C55E;
-  --green-light: #DCFCE7;
-  --green-dark: #15803D;
-  --yellow: #FBBF24;
-  --yellow-light: #FEF9C3;
-  --red: #EF4444;
-  --red-light: #FEE2E2;
-  --orange: #F97316;
-  --purple: #A855F7;
-  --purple-light: #F3E8FF;
-  --bg: #F0F9FF;
-  --surface: #FFFFFF;
-  --text: #1E293B;
-  --text-muted: #64748B;
-  --border: #E2E8F0;
-  --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-  --radius: 16px;
-  --radius-sm: 8px;
-  --font: 'Nunito', sans-serif;
-  --font-display: 'Fredoka One', cursive;
-}
+<!-- ===== HEADER ===== -->
+<header id="main-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-icon">🌟</span>
+      <span class="logo-text">English Adventure!</span>
+    </div>
+    <div class="header-right">
+      <div id="student-greeting" class="student-greeting hidden"></div>
+      <button id="teacher-btn" class="btn-teacher" aria-label="Teacher Mode">👩‍🏫 Teacher</button>
+    </div>
+  </div>
+  <!-- Progress Bar -->
+  <div class="progress-container" id="progress-container" style="display:none">
+    <div class="progress-label"><span id="progress-name">Student</span>'s Progress: <span id="progress-percent">0</span>%</div>
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progress-bar-inner"></div></div>
+    <div class="progress-sections" id="progress-sections"></div>
+  </div>
+</header>
 
-/* --- Reset & Base --- */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  font-size: 16px;
-  line-height: 1.6;
-}
+<!-- ===== TEACHER MODE MODAL ===== -->
+<div id="teacher-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="teacher-modal-title">
+  <div class="modal-box">
+    <h2 id="teacher-modal-title">👩‍🏫 Teacher Mode</h2>
+    <div id="teacher-login-form">
+      <p>Enter the teacher password:</p>
+      <input type="password" id="teacher-password-input" placeholder="Password" aria-label="Teacher password">
+      <p id="teacher-pass-error" class="error-msg hidden">❌ Wrong password! / ¡Contraseña incorrecta!</p>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="submitTeacherLogin()">Login / Entrar</button>
+        <button class="btn-secondary" onclick="closeTeacherModal()">Cancel / Cancelar</button>
+      </div>
+    </div>
+    <div id="teacher-panel" class="hidden">
+      <h3>🔧 Teacher Controls</h3>
+      <p><strong>Student:</strong> <span id="teacher-student-name">—</span></p>
+      <p><strong>Final Quiz:</strong> <span id="teacher-quiz-status">—</span></p>
+      <div class="teacher-actions">
+        <button class="btn-warning" onclick="teacherResetName()">🔄 Reset Student Name</button>
+        <button class="btn-warning" onclick="teacherResetQuiz()">🔄 Reset Final Quiz</button>
+        <button class="btn-warning" onclick="teacherResetAll()">⚠️ Reset All Progress</button>
+        <button class="btn-info" onclick="teacherShowAnswers()">👁️ Show Correct Answers</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeTeacherModal()">Close / Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-/* --- Header --- */
-#main-header {
-  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
-  color: white;
-  padding: 12px 20px;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.4);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 1100px;
-  margin: 0 auto;
-  gap: 12px;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.logo-icon { font-size: 1.8rem; }
-.logo-text {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  letter-spacing: 0.5px;
-}
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.student-greeting {
-  background: rgba(255,255,255,0.2);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
+<!-- ===== HOME SCREEN ===== -->
+<section id="screen-home" class="screen active">
+  <div class="home-hero">
+    <div class="hero-decoration">🎨📚✏️🌈</div>
+    <h1>Welcome to English Adventure!</h1>
+    <p class="hero-subtitle">Learn English in a fun and easy way! 🚀</p>
+    <div class="name-input-card">
+      <label for="student-name-input">What's your name? / ¿Cómo te llamas?</label>
+      <input type="text" id="student-name-input" placeholder="Your name here..." maxlength="20" aria-label="Enter your name">
+      <p id="name-error" class="error-msg hidden"></p>
+      <button class="btn-primary btn-large" onclick="saveName()">🚀 Start Learning!</button>
+    </div>
+  </div>
+</section>
 
-/* Progress Bar */
-.progress-container {
-  max-width: 1100px;
-  margin: 10px auto 0;
-  padding: 0 4px;
-}
-.progress-label {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  opacity: 0.9;
-}
-.progress-bar-outer {
-  background: rgba(255,255,255,0.25);
-  border-radius: 20px;
-  height: 12px;
-  overflow: hidden;
-}
-.progress-bar-inner {
-  height: 100%;
-  background: linear-gradient(90deg, var(--yellow), var(--green));
-  border-radius: 20px;
-  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  width: 0%;
-}
-.progress-sections {
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-  flex-wrap: wrap;
-}
-.progress-pill {
-  background: rgba(255,255,255,0.2);
-  padding: 2px 10px;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-.progress-pill.done {
-  background: var(--green);
-  color: white;
-}
+<!-- ===== MAIN MENU ===== -->
+<section id="screen-menu" class="screen hidden">
+  <div class="menu-greeting">
+    <h2>Hello, <span id="menu-name" class="highlight-name"></span>! 👋</h2>
+    <p>Choose your adventure! Click on a section to start.</p>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-card" id="card-library" onclick="showScreen('screen-library')">
+      <div class="card-icon">📚</div>
+      <div class="card-body">
+        <h3>Library Rules</h3>
+        <p>Learn CAN & CAN'T</p>
+        <div class="card-status" id="status-library">🔓 Open</div>
+      </div>
+    </div>
+    <div class="menu-card" id="card-connectors" onclick="showScreen('screen-connectors')">
+      <div class="card-icon">🔗</div>
+      <div class="card-body">
+        <h3>Connectors</h3>
+        <p>AND, BUT, OR</p>
+        <div class="card-status" id="status-connectors">🔓 Open</div>
+      </div>
+    </div>
+    <div class="menu-card" id="card-clothes" onclick="showScreen('screen-clothes')">
+      <div class="card-icon">👕</div>
+      <div class="card-body">
+        <h3>Clothes</h3>
+        <p>Vocabulary & Writing</p>
+        <div class="card-status" id="status-clothes">🔓 Open</div>
+      </div>
+    </div>
+    <div class="menu-card" id="card-haveto" onclick="showScreen('screen-haveto')">
+      <div class="card-icon">📋</div>
+      <div class="card-body">
+        <h3>Have To / Has To</h3>
+        <p>Obligation</p>
+        <div class="card-status" id="status-haveto">🔓 Open</div>
+      </div>
+    </div>
+    <div class="menu-card" id="card-playground" onclick="showScreen('screen-playground')">
+      <div class="card-icon">🛝</div>
+      <div class="card-body">
+        <h3>Playground Writing</h3>
+        <p>Write your own rules!</p>
+        <div class="card-status" id="status-playground">🔓 Open</div>
+      </div>
+    </div>
+    <div class="menu-card" id="card-finalquiz" onclick="attemptFinalQuiz()">
+      <div class="card-icon">🏆</div>
+      <div class="card-body">
+        <h3>Final Quiz</h3>
+        <p>Test everything!</p>
+        <div class="card-status" id="status-finalquiz">🔒 Complete all sections first</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-/* --- Buttons --- */
-button { cursor: pointer; border: none; font-family: var(--font); transition: all 0.2s; }
-.btn-primary {
-  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
-  color: white;
-  padding: 10px 22px;
-  border-radius: 12px;
-  font-weight: 800;
-  font-size: 1rem;
-  box-shadow: 0 4px 10px rgba(59,130,246,0.35);
-}
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(59,130,246,0.5); }
-.btn-primary:active { transform: translateY(0); }
-.btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  padding: 10px 22px;
-  border-radius: 12px;
-  font-weight: 700;
-  border: 2px solid var(--border);
-}
-.btn-secondary:hover { background: var(--bg); border-color: var(--blue); }
-.btn-hint {
-  background: var(--yellow-light);
-  color: #92400E;
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-weight: 700;
-  border: 2px solid var(--yellow);
-}
-.btn-hint:hover { background: var(--yellow); }
-.btn-teacher {
-  background: rgba(255,255,255,0.2);
-  color: white;
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-.btn-teacher:hover { background: rgba(255,255,255,0.35); }
-.btn-back {
-  background: var(--blue-light);
-  color: var(--blue-dark);
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-.btn-back:hover { background: var(--blue); color: white; }
-.btn-warning {
-  background: linear-gradient(135deg, var(--orange), #dc2626);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 700;
-}
-.btn-warning:hover { opacity: 0.9; transform: translateY(-1px); }
-.btn-info {
-  background: var(--purple-light);
-  color: var(--purple);
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 700;
-  border: 2px solid var(--purple);
-}
-.btn-info:hover { background: var(--purple); color: white; }
-.btn-large { padding: 14px 32px; font-size: 1.1rem; border-radius: 14px; }
-button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+<!-- ===== LIBRARY RULES SCREEN ===== -->
+<section id="screen-library" class="screen hidden">
+  <div class="screen-header">
+    <button class="btn-back" onclick="showScreen('screen-menu')">← Back</button>
+    <h2>📚 Library Rules — CAN / CAN'T</h2>
+  </div>
 
-/* --- Screens --- */
-.screen { display: none; padding: 20px; max-width: 1100px; margin: 0 auto; animation: fadeIn 0.4s ease; }
-.screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('library','reading')">📖 Reading</button>
+    <button class="tab-btn" onclick="switchTab('library','exercises')">✏️ Exercises</button>
+    <button class="tab-btn" onclick="switchTab('library','video')">🎬 Video</button>
+  </div>
 
-/* --- Home Screen --- */
-#screen-home {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 80px);
-  max-width: none;
-  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #DCFCE7 100%);
-}
-.home-hero {
-  text-align: center;
-  padding: 40px 20px;
-  max-width: 500px;
-}
-.hero-decoration { font-size: 2.5rem; margin-bottom: 16px; }
-.home-hero h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 3rem);
-  color: var(--blue-dark);
-  margin-bottom: 8px;
-}
-.hero-subtitle {
-  font-size: 1.2rem;
-  color: var(--text-muted);
-  margin-bottom: 30px;
-  font-weight: 600;
-}
-.name-input-card {
-  background: var(--surface);
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.name-input-card label {
-  font-weight: 800;
-  font-size: 1.05rem;
-  color: var(--text);
-}
-.name-input-card input {
-  padding: 14px 18px;
-  border-radius: 12px;
-  border: 2.5px solid var(--border);
-  font-family: var(--font);
-  font-size: 1.1rem;
-  transition: border-color 0.2s;
-}
-.name-input-card input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
+  <!-- Reading Tab -->
+  <div id="library-reading" class="tab-content active">
+    <div class="content-card">
+      <h3>🏛️ Welcome to the City Library!</h3>
+      <div class="reading-text">
+        <p>The City Library is a wonderful place to read, study, and learn. But remember — there are rules!</p>
+        <div class="rules-box">
+          <h4>✅ You CAN:</h4>
+          <ul>
+            <li>📗 You <strong>can</strong> borrow up to 5 books.</li>
+            <li>💻 You <strong>can</strong> use the computers for 1 hour.</li>
+            <li>📝 You <strong>can</strong> take notes quietly.</li>
+            <li>🎧 You <strong>can</strong> listen to audiobooks with headphones.</li>
+            <li>📷 You <strong>can</strong> take photos of pages for study.</li>
+          </ul>
+        </div>
+        <div class="rules-box rules-box-red">
+          <h4>❌ You CAN'T:</h4>
+          <ul>
+            <li>🍕 You <strong>can't</strong> eat food inside.</li>
+            <li>📱 You <strong>can't</strong> make phone calls.</li>
+            <li>🔊 You <strong>can't</strong> play loud music.</li>
+            <li>🐕 You <strong>can't</strong> bring pets.</li>
+            <li>✂️ You <strong>can't</strong> cut or damage books.</li>
+          </ul>
+        </div>
+        <div class="grammar-box">
+          <h4>📌 Grammar Note</h4>
+          <p><strong>CAN</strong> = it is possible / allowed ✅</p>
+          <p><strong>CAN'T</strong> = it is not possible / not allowed ❌</p>
+          <p>Structure: <em>Subject + CAN/CAN'T + base verb</em></p>
+          <p>Example: "You <strong>can</strong> <em>borrow</em> books." | "You <strong>can't</strong> <em>eat</em> here."</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-/* --- Menu --- */
-.menu-greeting {
-  text-align: center;
-  margin-bottom: 24px;
-}
-.menu-greeting h2 {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  color: var(--blue-dark);
-}
-.menu-greeting p { color: var(--text-muted); font-size: 1.05rem; font-weight: 600; }
-.highlight-name { color: var(--orange); }
-.menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
-.menu-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: all 0.25s;
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  border: 2px solid var(--border);
-}
-.menu-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--blue);
-}
-.card-icon { font-size: 2.5rem; flex-shrink: 0; }
-.card-body h3 {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-.card-body p { color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
-.card-status {
-  margin-top: 8px;
-  font-size: 0.82rem;
-  font-weight: 800;
-  padding: 3px 10px;
-  border-radius: 20px;
-  display: inline-block;
-  background: var(--green-light);
-  color: var(--green-dark);
-}
-.card-status.locked { background: var(--red-light); color: var(--red); }
-.card-status.done { background: var(--green-light); color: var(--green-dark); }
+  <!-- Exercises Tab -->
+  <div id="library-exercises" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>Exercise 1: Comprehension Questions (10 Questions)</h3>
+      <div id="library-comprehension"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('library-comprehension')">✅ Check Answers</button>
+        <button class="btn-secondary" onclick="retryExercise('library-comprehension')">🔄 Try Again</button>
+        <button class="btn-hint" onclick="showHint('library-comp-hint')">💡 Hint</button>
+        <div id="library-comp-hint" class="hint-box hidden">Look at the CAN and CAN'T lists in the Reading section!</div>
+      </div>
+      <div id="library-comprehension-result" class="result-box hidden"></div>
+    </div>
 
-/* --- Screen Header --- */
-.screen-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.screen-header h2 {
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  color: var(--blue-dark);
-}
+    <div class="exercise-section">
+      <h3>Exercise 2: Sentence Matching (8 sentences)</h3>
+      <div id="library-matching"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('library-matching')">✅ Check Answers</button>
+        <button class="btn-secondary" onclick="retryExercise('library-matching')">🔄 Try Again</button>
+        <button class="btn-hint" onclick="showHint('library-match-hint')">💡 Hint</button>
+        <div id="library-match-hint" class="hint-box hidden">Match the first part of each sentence with the correct ending!</div>
+      </div>
+      <div id="library-matching-result" class="result-box hidden"></div>
+    </div>
 
-/* --- Tabs --- */
-.tab-nav {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  border-bottom: 3px solid var(--border);
-  padding-bottom: 0;
-}
-.tab-btn {
-  background: transparent;
-  color: var(--text-muted);
-  padding: 10px 18px;
-  border-radius: 12px 12px 0 0;
-  font-weight: 700;
-  font-size: 0.9rem;
-  border: 2px solid transparent;
-  border-bottom: none;
-  transition: all 0.2s;
-}
-.tab-btn:hover { background: var(--blue-light); color: var(--blue-dark); }
-.tab-btn.active {
-  background: var(--surface);
-  color: var(--blue-dark);
-  border-color: var(--border);
-  border-bottom: 2px solid var(--surface);
-  margin-bottom: -3px;
-  z-index: 1;
-}
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    <div class="exercise-section">
+      <h3>Exercise 3: True or False (8 sentences)</h3>
+      <div id="library-truefalse"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('library-truefalse')">✅ Check Answers</button>
+        <button class="btn-secondary" onclick="retryExercise('library-truefalse')">🔄 Try Again</button>
+        <button class="btn-hint" onclick="showHint('library-tf-hint')">💡 Hint</button>
+        <div id="library-tf-hint" class="hint-box hidden">Think about the library rules you read!</div>
+      </div>
+      <div id="library-truefalse-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* --- Content Cards --- */
-.content-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 28px;
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-}
-.content-card h3 {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  color: var(--blue-dark);
-  margin-bottom: 16px;
-}
+  <!-- Video Tab -->
+  <div id="library-video" class="tab-content hidden">
+    <div class="video-section">
+      <h3>🎬 Watch & Learn: CAN and CAN'T</h3>
+      <p>Watch the video carefully, then answer the questions below!</p>
+      <div class="video-tabs">
+        <button class="video-tab-btn active" onclick="switchVideo('library','EAFQ9Pj_hSM','_facQiZDrU4',0)">▶ Video 1</button>
+        <button class="video-tab-btn" onclick="switchVideo('library','EAFQ9Pj_hSM','_facQiZDrU4',1)">▶ Video 2</button>
+      </div>
+      <div class="video-wrapper">
+        <iframe id="library-iframe" src="https://www.youtube.com/embed/EAFQ9Pj_hSM" 
+          title="Can and Can't for kids"
+          frameborder="0" 
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen
+          aria-label="Educational video about CAN and CAN'T"></iframe>
+      </div>
+      <div id="library-video-quiz" class="video-quiz">
+        <h4>📝 Video Questions — Answer after watching!</h4>
+        <div id="library-video-questions"></div>
+        <button class="btn-primary" onclick="submitVideoQuiz('library')">Submit Answers / Enviar</button>
+        <div id="library-video-result" class="result-box hidden"></div>
+      </div>
+    </div>
+  </div>
 
-/* --- Reading Section --- */
-.reading-text p { margin-bottom: 14px; line-height: 1.8; }
-.rules-box {
-  background: var(--green-light);
-  border-left: 5px solid var(--green);
-  border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  margin: 12px 0;
-}
-.rules-box-red {
-  background: var(--red-light);
-  border-left-color: var(--red);
-}
-.rules-box h4, .rules-box-red h4 {
-  font-size: 1.05rem;
-  margin-bottom: 10px;
-  font-weight: 800;
-}
-.rules-box ul, .rules-box-red ul { list-style: none; padding: 0; }
-.rules-box li, .rules-box-red li { padding: 4px 0; font-weight: 600; }
-.grammar-box {
-  background: var(--yellow-light);
-  border-left: 5px solid var(--yellow);
-  border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  margin: 12px 0;
-}
-.grammar-box h4 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
-.grammar-box p { margin-bottom: 6px; }
-.grammar-table-wrapper { overflow-x: auto; margin: 16px 0; }
-.grammar-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  font-size: 0.95rem;
-}
-.grammar-table th {
-  background: var(--blue);
-  color: white;
-  padding: 12px 16px;
-  text-align: left;
-  font-weight: 800;
-}
-.grammar-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
-.grammar-table tr:nth-child(even) td { background: var(--bg); }
+  <div class="section-complete-banner hidden" id="library-complete-banner">
+    🎉 Library Section Complete! You earned a star! ⭐
+  </div>
+</section>
 
-/* --- Exercise Sections --- */
-.exercise-section {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow);
-}
-.exercise-section h3 {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--blue-dark);
-  margin-bottom: 16px;
-}
-.ex-controls {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  align-items: center;
-}
-.hint-box {
-  background: var(--yellow-light);
-  border: 2px dashed var(--yellow);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  margin-top: 10px;
-  font-weight: 700;
-  width: 100%;
-  animation: fadeIn 0.3s ease;
-}
-.result-box {
-  margin-top: 16px;
-  padding: 16px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
-  font-size: 1rem;
-  animation: fadeIn 0.3s ease;
-}
-.result-box.success { background: var(--green-light); border-left: 5px solid var(--green); color: var(--green-dark); }
-.result-box.partial { background: var(--yellow-light); border-left: 5px solid var(--yellow); color: #92400E; }
-.result-box.fail { background: var(--red-light); border-left: 5px solid var(--red); color: #991B1B; }
+<!-- ===== CONNECTORS SCREEN ===== -->
+<section id="screen-connectors" class="screen hidden">
+  <div class="screen-header">
+    <button class="btn-back" onclick="showScreen('screen-menu')">← Back</button>
+    <h2>🔗 Connectors — AND / BUT / OR</h2>
+  </div>
 
-/* --- Questions: MCQ, T/F, Fill Blank --- */
-.question-item {
-  margin-bottom: 20px;
-  padding: 16px;
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--border);
-  transition: border-color 0.2s;
-}
-.question-item:focus-within { border-color: var(--blue); }
-.question-text {
-  font-weight: 700;
-  margin-bottom: 12px;
-  font-size: 1rem;
-}
-.question-num {
-  display: inline-block;
-  background: var(--blue);
-  color: white;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  text-align: center;
-  line-height: 28px;
-  font-weight: 800;
-  font-size: 0.85rem;
-  margin-right: 8px;
-  flex-shrink: 0;
-}
-.options-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.option-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--border);
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-.option-label:hover { border-color: var(--blue); background: var(--blue-light); }
-.option-label input[type="radio"] { accent-color: var(--blue); width: 16px; height: 16px; }
-.option-label.correct { border-color: var(--green); background: var(--green-light); }
-.option-label.incorrect { border-color: var(--red); background: var(--red-light); }
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('connectors','explain')">📖 Learn</button>
+    <button class="tab-btn" onclick="switchTab('connectors','fillblank')">✏️ Fill Blanks</button>
+    <button class="tab-btn" onclick="switchTab('connectors','mcq')">❓ MCQ</button>
+    <button class="tab-btn" onclick="switchTab('connectors','builder')">🏗️ Sentence Builder</button>
+    <button class="tab-btn" onclick="switchTab('connectors','video')">🎬 Video</button>
+  </div>
 
-.tf-buttons { display: flex; gap: 10px; }
-.tf-btn {
-  padding: 8px 20px;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 0.95rem;
-  border: 2px solid var(--border);
-  background: var(--surface);
-  transition: all 0.2s;
-}
-.tf-btn:hover { border-color: var(--blue); }
-.tf-btn.selected { background: var(--blue); color: white; border-color: var(--blue); }
-.tf-btn.selected-true { background: var(--green); border-color: var(--green); }
-.tf-btn.selected-false { background: var(--red); border-color: var(--red); }
-.tf-btn.correct-answer { background: var(--green); border-color: var(--green); color: white; }
-.tf-btn.wrong-answer { background: var(--red); border-color: var(--red); color: white; }
+  <div id="connectors-explain" class="tab-content active">
+    <div class="content-card">
+      <h3>🔗 Connectors: AND, BUT, OR</h3>
+      <div class="connector-grid">
+        <div class="connector-card connector-and">
+          <h4>➕ AND</h4>
+          <p>Use AND to <strong>add</strong> information or join two similar ideas.</p>
+          <div class="examples">
+            <p>✅ I like cats <strong>and</strong> dogs.</p>
+            <p>✅ She reads books <strong>and</strong> watches films.</p>
+          </div>
+        </div>
+        <div class="connector-card connector-but">
+          <h4>↔️ BUT</h4>
+          <p>Use BUT to show a <strong>contrast</strong> or difference.</p>
+          <div class="examples">
+            <p>✅ I like swimming, <strong>but</strong> I don't like running.</p>
+            <p>✅ He is tall, <strong>but</strong> his brother is short.</p>
+          </div>
+        </div>
+        <div class="connector-card connector-or">
+          <h4>❓ OR</h4>
+          <p>Use OR to show a <strong>choice</strong> or alternative.</p>
+          <div class="examples">
+            <p>✅ Do you want tea <strong>or</strong> coffee?</p>
+            <p>✅ We can go to the park <strong>or</strong> the cinema.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-.fill-input {
-  border: 2.5px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-family: var(--font);
-  font-size: 1rem;
-  font-weight: 600;
-  transition: border-color 0.2s;
-  width: 140px;
-}
-.fill-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
-.fill-input.correct { border-color: var(--green); background: var(--green-light); }
-.fill-input.incorrect { border-color: var(--red); background: var(--red-light); }
+  <div id="connectors-fillblank" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>Fill in the blanks with AND, BUT, or OR (12 sentences)</h3>
+      <div id="connectors-fb-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('connectors-fb')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('connectors-fb')">🔄 Retry</button>
+        <button class="btn-hint" onclick="showHint('connectors-fb-hint')">💡 Hint</button>
+        <div id="connectors-fb-hint" class="hint-box hidden">AND = add, BUT = contrast, OR = choice</div>
+      </div>
+      <div id="connectors-fb-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-.explanation {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 8px;
-  padding: 8px 12px;
-  background: var(--purple-light);
-  border-radius: var(--radius-sm);
-  font-style: italic;
-  display: none;
-}
-.explanation.visible { display: block; animation: fadeIn 0.3s ease; }
+  <div id="connectors-mcq" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>Choose the correct connector (12 questions)</h3>
+      <div id="connectors-mcq-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('connectors-mcq')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('connectors-mcq')">🔄 Retry</button>
+      </div>
+      <div id="connectors-mcq-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* Matching exercise */
-.matching-item {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.matching-left { font-weight: 600; padding: 10px 14px; background: var(--blue-light); border-radius: var(--radius-sm); }
-.matching-arrow { font-size: 1.3rem; }
-.matching-select {
-  padding: 10px 14px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font);
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-.matching-select:focus { outline: none; border-color: var(--blue); }
-.matching-select.correct { border-color: var(--green); background: var(--green-light); }
-.matching-select.incorrect { border-color: var(--red); background: var(--red-light); }
+  <div id="connectors-builder" class="tab-content hidden">
+    <div class="content-card">
+      <h3>🏗️ Sentence Builder</h3>
+      <p>Create your own sentences using AND, BUT, and OR!</p>
+      <div class="builder-tool">
+        <div class="builder-row">
+          <input type="text" id="builder-part1" placeholder="First part of sentence..." aria-label="First part of sentence">
+          <select id="builder-connector" aria-label="Choose connector">
+            <option value="and">AND</option>
+            <option value="but">BUT</option>
+            <option value="or">OR</option>
+          </select>
+          <input type="text" id="builder-part2" placeholder="Second part of sentence..." aria-label="Second part of sentence">
+        </div>
+        <button class="btn-primary" onclick="buildSentence()">✨ Build Sentence!</button>
+        <div id="builder-output" class="builder-output hidden"></div>
+        <div id="builder-history" class="builder-history"></div>
+      </div>
+    </div>
+  </div>
 
-/* --- Video Section --- */
-.video-section { max-width: 800px; }
-.video-section h3 {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  color: var(--blue-dark);
-  margin-bottom: 8px;
-}
-.video-section p { color: var(--text-muted); font-weight: 600; margin-bottom: 16px; }
-.video-wrapper {
-  position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
-  overflow: hidden;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 24px;
-  background: #000;
-}
-.video-wrapper iframe {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  border-radius: var(--radius);
-}
-.video-quiz {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-  margin-top: 16px;
-}
-.video-quiz h4 {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--blue-dark);
-  margin-bottom: 16px;
-}
+  <div id="connectors-video" class="tab-content hidden">
+    <div class="video-section">
+      <h3>🎬 Watch & Learn: Connectors</h3>
+      <div class="video-wrapper">
+        <iframe src="https://www.youtube.com/embed/tmerK-Fjc_s"
+          title="English connectors AND BUT OR for kids"
+          frameborder="0"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          aria-label="Educational video about connectors AND BUT OR"></iframe>
+      </div>
+      <div id="connectors-video-quiz" class="video-quiz">
+        <h4>📝 Video Questions</h4>
+        <div id="connectors-video-questions"></div>
+        <button class="btn-primary" onclick="submitVideoQuiz('connectors')">Submit Answers</button>
+        <div id="connectors-video-result" class="result-box hidden"></div>
+      </div>
+    </div>
+  </div>
 
-/* --- Connectors Section --- */
-.connector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-}
-.connector-card {
-  border-radius: var(--radius);
-  padding: 20px;
-  border: 2.5px solid var(--border);
-}
-.connector-card h4 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
-.connector-card p { font-size: 0.9rem; margin-bottom: 12px; }
-.connector-and { background: #ECFDF5; border-color: var(--green); }
-.connector-and h4 { color: var(--green-dark); }
-.connector-but { background: #FEF3C7; border-color: var(--yellow); }
-.connector-but h4 { color: #92400E; }
-.connector-or { background: #EDE9FE; border-color: var(--purple); }
-.connector-or h4 { color: #6D28D9; }
-.examples { background: rgba(255,255,255,0.7); border-radius: var(--radius-sm); padding: 10px; }
-.examples p { margin-bottom: 6px; font-size: 0.88rem; font-weight: 600; }
+  <div class="section-complete-banner hidden" id="connectors-complete-banner">
+    🎉 Connectors Section Complete! You earned a star! ⭐
+  </div>
+</section>
 
-/* Sentence Builder */
-.builder-tool { display: flex; flex-direction: column; gap: 14px; }
-.builder-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.builder-row input {
-  flex: 1;
-  min-width: 140px;
-  padding: 10px 14px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font);
-  font-size: 1rem;
-  font-weight: 600;
-}
-.builder-row input:focus { outline: none; border-color: var(--blue); }
-.builder-row select {
-  padding: 10px 14px;
-  border: 2px solid var(--blue);
-  border-radius: var(--radius-sm);
-  font-family: var(--font);
-  font-weight: 800;
-  font-size: 1rem;
-  background: var(--blue-light);
-  color: var(--blue-dark);
-}
-.builder-output {
-  background: var(--green-light);
-  border: 2px solid var(--green);
-  border-radius: var(--radius-sm);
-  padding: 14px 20px;
-  font-weight: 700;
-  font-size: 1.1rem;
-  animation: slideDown 0.3s ease;
-}
-.builder-history { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
-.builder-history-item {
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-  padding: 8px 14px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border-left: 4px solid var(--blue);
-}
+<!-- ===== CLOTHES SCREEN ===== -->
+<section id="screen-clothes" class="screen hidden">
+  <div class="screen-header">
+    <button class="btn-back" onclick="showScreen('screen-menu')">← Back</button>
+    <h2>👕 Clothes Vocabulary</h2>
+  </div>
 
-/* --- Clothes Section --- */
-.clothes-label-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px;
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-  margin-bottom: 12px;
-  border: 2px solid var(--border);
-}
-.clothes-emoji { font-size: 2rem; min-width: 50px; text-align: center; }
-.clothes-label-prompt { font-weight: 600; flex: 1; }
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('clothes','label')">🏷️ Label</button>
+    <button class="tab-btn" onclick="switchTab('clothes','match')">🔀 Match</button>
+    <button class="tab-btn" onclick="switchTab('clothes','writing')">✍️ Writing</button>
 
-/* --- Playground Writing --- */
-.writing-checklist {
-  background: var(--green-light);
-  border-left: 5px solid var(--green);
-  border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  margin-bottom: 20px;
-}
-.writing-checklist h4 { font-weight: 800; margin-bottom: 10px; }
-.writing-checklist ul { list-style: none; padding: 0; }
-.writing-checklist li { padding: 4px 0; font-weight: 600; }
-.playground-prompt {
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  margin-bottom: 14px;
-  border: 2px solid var(--border);
-  box-shadow: var(--shadow);
-}
-.playground-prompt-text { font-weight: 700; margin-bottom: 8px; }
-.playground-textarea {
-  width: 100%;
-  min-height: 60px;
-  padding: 10px 14px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font);
-  font-size: 1rem;
-  resize: vertical;
-}
-.playground-textarea:focus { outline: none; border-color: var(--blue); }
-.playground-feedback {
-  font-size: 0.9rem;
-  margin-top: 6px;
-  font-weight: 600;
-  min-height: 24px;
-}
+  </div>
 
-/* --- Final Quiz --- */
-.quiz-intro { border-left: 5px solid var(--blue); }
-.quiz-intro p { margin-bottom: 8px; font-size: 1.05rem; }
-.quiz-section-header {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--blue-dark);
-  margin: 24px 0 14px;
-  padding: 10px 16px;
-  background: var(--blue-light);
-  border-radius: var(--radius-sm);
-}
-.lock-message {
-  text-align: center;
-  padding: 40px 20px;
-}
-.lock-icon { font-size: 4rem; margin-bottom: 16px; }
-.lock-message h3 {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  color: var(--text);
-  margin-bottom: 10px;
-}
-.quiz-results-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 36px;
-  box-shadow: var(--shadow-lg);
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto;
-}
-.quiz-results-card h2 {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  color: var(--blue-dark);
-  margin-bottom: 20px;
-}
-.score-display {
-  font-family: var(--font-display);
-  font-size: 3.5rem;
-  color: var(--orange);
-  margin: 16px 0;
-}
-.breakdown-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 14px;
-  margin: 20px 0;
-  text-align: left;
-}
-.breakdown-item {
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  border: 2px solid var(--border);
-}
-.breakdown-item h5 { font-weight: 800; margin-bottom: 6px; }
-.breakdown-item .bd-score { font-size: 1.3rem; font-weight: 800; color: var(--blue); }
-.study-suggestions {
-  background: var(--yellow-light);
-  border-left: 5px solid var(--yellow);
-  border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  margin: 20px 0;
-  text-align: left;
-}
-.study-suggestions h4 { font-weight: 800; margin-bottom: 10px; }
-.teacher-actions { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+  <div id="clothes-label" class="tab-content active">
+    <div class="exercise-section">
+      <h3>🏷️ Label the Clothes! (12 items)</h3>
+      <p>Look at the emoji and type the correct word!</p>
+      <div id="clothes-label-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('clothes-label')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('clothes-label')">🔄 Retry</button>
+        <button class="btn-hint" onclick="showHint('clothes-label-hint')">💡 Hint</button>
+        <div id="clothes-label-hint" class="hint-box hidden">Words: shirt, dress, shoes, hat, jacket, trousers, socks, skirt, boots, coat, scarf, gloves</div>
+      </div>
+      <div id="clothes-label-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* --- Section Complete Banner --- */
-.section-complete-banner {
-  background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
-  color: white;
-  text-align: center;
-  padding: 20px;
-  border-radius: var(--radius);
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  box-shadow: 0 6px 20px rgba(34,197,94,0.4);
-  margin-top: 24px;
-  animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes bounceIn {
-  from { transform: scale(0.5); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
+  <div id="clothes-match" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>🔀 Match the clothes with descriptions (10 pairs)</h3>
+      <div id="clothes-match-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('clothes-match')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('clothes-match')">🔄 Retry</button>
+      </div>
+      <div id="clothes-match-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* --- Modal --- */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.modal-box {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 32px;
-  max-width: 440px;
-  width: 100%;
-  box-shadow: var(--shadow-lg);
-  animation: fadeIn 0.3s ease;
-}
-.modal-box h2 {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  color: var(--blue-dark);
-  margin-bottom: 16px;
-}
-.modal-box h3 {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--text);
-  margin-bottom: 14px;
-}
-.modal-box input[type="password"] {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font);
-  font-size: 1rem;
-  margin: 10px 0;
-}
-.modal-box input[type="password"]:focus { outline: none; border-color: var(--blue); }
-.modal-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-.error-msg {
-  color: var(--red);
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-top: 4px;
-}
+  <div id="clothes-writing" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>✍️ "I'm wearing..." Writing Tasks (8 tasks)</h3>
+      <p>Write a sentence using <strong>"I'm wearing..."</strong></p>
+      <div id="clothes-writing-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('clothes-writing')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('clothes-writing')">🔄 Retry</button>
+      </div>
+      <div id="clothes-writing-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* --- Toast --- */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background: var(--text);
-  color: white;
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-weight: 700;
-  z-index: 999;
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  white-space: nowrap;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
 
-/* --- Utility --- */
-.hidden { display: none !important; }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  <div class="section-complete-banner hidden" id="clothes-complete-banner">
+    🎉 Clothes Section Complete! You earned a star! ⭐
+  </div>
+</section>
 
-/* --- Have to short answer style --- */
-.short-answer-item {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 14px;
-}
-.short-context { font-weight: 600; background: var(--blue-light); padding: 10px 14px; border-radius: var(--radius-sm); }
-.short-arrow { font-size: 1.3rem; color: var(--text-muted); }
+<!-- ===== HAVE TO / HAS TO SCREEN ===== -->
+<section id="screen-haveto" class="screen hidden">
+  <div class="screen-header">
+    <button class="btn-back" onclick="showScreen('screen-menu')">← Back</button>
+    <h2>📋 Have To / Has To</h2>
+  </div>
 
-/* --- Responsive --- */
-@media (max-width: 600px) {
-  .logo-text { font-size: 1.2rem; }
-  .menu-grid { grid-template-columns: 1fr 1fr; }
-  .tab-btn { padding: 8px 12px; font-size: 0.82rem; }
-  .content-card { padding: 18px; }
-  .matching-item { grid-template-columns: 1fr; gap: 6px; }
-  .matching-arrow { display: none; }
-  .short-answer-item { grid-template-columns: 1fr; }
-  .short-arrow { display: none; }
-  .builder-row { flex-direction: column; align-items: stretch; }
-  .builder-row input, .builder-row select { width: 100%; }
-  .modal-box { padding: 20px; }
-  .connector-grid { grid-template-columns: 1fr; }
-  .menu-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 400px) {
-  .menu-card { padding: 16px; }
-  .card-icon { font-size: 1.8rem; }
-}
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('haveto','learn')">📖 Learn</button>
+    <button class="tab-btn" onclick="switchTab('haveto','table')">📊 Table</button>
+    <button class="tab-btn" onclick="switchTab('haveto','fillblank')">✏️ Fill Blanks</button>
+    <button class="tab-btn" onclick="switchTab('haveto','mcq')">❓ MCQ</button>
+    <button class="tab-btn" onclick="switchTab('haveto','short')">✍️ Short Answer</button>
+    <button class="tab-btn" onclick="switchTab('haveto','video')">🎬 Video</button>
+  </div>
 
-/* Video tab switcher */
-.video-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-.video-tab-btn {
-  background: var(--blue-light);
-  color: var(--blue-dark);
-  padding: 8px 18px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  border: 2px solid var(--border);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.video-tab-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
-.video-tab-btn:hover { border-color: var(--blue); }
+  <div id="haveto-learn" class="tab-content active">
+    <div class="content-card">
+      <h3>📋 Have To / Has To — Obligation</h3>
+      <div class="grammar-table-wrapper">
+        <table class="grammar-table">
+          <thead><tr><th>Subject</th><th>Form</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>I / You / We / They</td><td><strong>have to</strong></td><td>I <strong>have to</strong> study.</td></tr>
+            <tr><td>He / She / It</td><td><strong>has to</strong></td><td>She <strong>has to</strong> study.</td></tr>
+            <tr><td>I / You / We / They (❌)</td><td><strong>don't have to</strong></td><td>I <strong>don't have to</strong> cook.</td></tr>
+            <tr><td>He / She / It (❌)</td><td><strong>doesn't have to</strong></td><td>He <strong>doesn't have to</strong> cook.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grammar-box">
+        <h4>💡 Remember!</h4>
+        <p>Use <strong>HAVE TO / HAS TO</strong> when something is <em>necessary</em> or <em>obligatory</em>.</p>
+        <p>❗ With he/she/it: <strong>HAS to</strong> (not HAVE to)</p>
+        <p>Structure: <em>Subject + have to/has to + base verb</em></p>
+      </div>
+    </div>
+  </div>
 
-/* Video tab switcher */
-a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 3px solid var(--yellow);
-  outline-offset: 2px;
-}
+  <div id="haveto-table" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>📊 Complete the Table</h3>
+      <p>Fill in the correct form (have to / has to / don't have to / doesn't have to)</p>
+      <div id="haveto-table-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('haveto-table')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('haveto-table')">🔄 Retry</button>
+        <button class="btn-hint" onclick="showHint('haveto-table-hint')">💡 Hint</button>
+        <div id="haveto-table-hint" class="hint-box hidden">He/She/It → has to / doesn't have to. I/You/We/They → have to / don't have to</div>
+      </div>
+      <div id="haveto-table-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* --- Clothes Card Grid --- */
-.clothes-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
-  margin-bottom: 8px;
-}
-.clothes-card {
-  border-radius: var(--radius);
-  padding: 20px 14px 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  border: 2.5px solid rgba(0,0,0,0.08);
-  box-shadow: var(--shadow);
-  transition: transform 0.2s;
-}
-.clothes-card:hover { transform: translateY(-3px); }
-.clothes-card-emoji {
-  font-size: 3.5rem;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
-}
-.clothes-card-input {
-  width: 100%;
-  text-align: center;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 2px solid rgba(0,0,0,0.12);
-  font-size: 0.95rem;
-  font-weight: 700;
-  background: rgba(255,255,255,0.8);
-}
-.clothes-card-input:focus { outline: none; border-color: var(--blue); background: white; }
-.clothes-card-input.correct { border-color: var(--green); background: var(--green-light); }
-.clothes-card-input.incorrect { border-color: var(--red); background: var(--red-light); }
-.clothes-card-exp {
-  font-size: 0.8rem;
-  text-align: center;
-  line-height: 1.4;
-  color: var(--text);
-}
-@media (max-width: 480px) {
-  .clothes-card-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-  .clothes-card-emoji { font-size: 2.8rem; }
-}
+  <div id="haveto-fillblank" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>✏️ Fill in the blanks (12 sentences)</h3>
+      <div id="haveto-fb-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('haveto-fb')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('haveto-fb')">🔄 Retry</button>
+        <button class="btn-hint" onclick="showHint('haveto-fb-hint')">💡 Hint</button>
+        <div id="haveto-fb-hint" class="hint-box hidden">Look at the subject! I/You/We/They = have to. He/She/It = has to.</div>
+      </div>
+      <div id="haveto-fb-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* --- Clothes label old style (kept for safety) --- */
+  <div id="haveto-mcq" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>❓ Multiple Choice (12 questions)</h3>
+      <div id="haveto-mcq-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('haveto-mcq')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('haveto-mcq')">🔄 Retry</button>
+      </div>
+      <div id="haveto-mcq-result" class="result-box hidden"></div>
+    </div>
+  </div>
 
-/* Writing validation icons */
-.check-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-.check-item.pass { color: var(--green-dark); }
-.check-item.fail { color: var(--red); }
+  <div id="haveto-short" class="tab-content hidden">
+    <div class="exercise-section">
+      <h3>✍️ Short Answer Pairings (10 questions)</h3>
+      <div id="haveto-short-exercises"></div>
+      <div class="ex-controls">
+        <button class="btn-primary" onclick="checkExercise('haveto-short')">✅ Check</button>
+        <button class="btn-secondary" onclick="retryExercise('haveto-short')">🔄 Retry</button>
+      </div>
+      <div id="haveto-short-result" class="result-box hidden"></div>
+    </div>
+  </div>
+
+  <div id="haveto-video" class="tab-content hidden">
+    <div class="video-section">
+      <h3>🎬 Watch & Learn: Have To / Has To</h3>
+      <div class="video-wrapper">
+        <iframe src="https://www.youtube.com/embed/2sb-z6_zCJ0"
+          title="Have to Has to for kids"
+          frameborder="0"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          aria-label="Educational video about have to and has to"></iframe>
+      </div>
+      <div id="haveto-video-quiz" class="video-quiz">
+        <h4>📝 Video Questions</h4>
+        <div id="haveto-video-questions"></div>
+        <button class="btn-primary" onclick="submitVideoQuiz('haveto')">Submit Answers</button>
+        <div id="haveto-video-result" class="result-box hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-complete-banner hidden" id="haveto-complete-banner">
+    🎉 Have To Section Complete! You earned a star! ⭐
+  </div>
+</section>
+
+<!-- ===== PLAYGROUND WRITING SCREEN ===== -->
+<section id="screen-playground" class="screen hidden">
+  <div class="screen-header">
+    <button class="btn-back" onclick="showScreen('screen-menu')">← Back</button>
+    <h2>🛝 Playground Writing Rules</h2>
+  </div>
+  <div class="content-card">
+    <p>Write 8 sentences about playground rules using CAN or CAN'T! 🎯</p>
+    <div class="writing-checklist">
+      <h4>✅ Your sentence must:</h4>
+      <ul>
+        <li>✏️ Start with a capital letter</li>
+        <li>🔚 End with a period (.)</li>
+        <li>🔤 Include "can" or "can't"</li>
+        <li>📝 Use a base verb after can/can't</li>
+        <li>📏 Have at least 3 words</li>
+      </ul>
+    </div>
+    <div id="playground-prompts"></div>
+    <button class="btn-primary btn-large" onclick="submitPlayground()" id="playground-submit-btn">🚀 Submit All Writing!</button>
+    <div id="playground-result" class="result-box hidden"></div>
+  </div>
+  <div class="section-complete-banner hidden" id="playground-complete-banner">
+    🎉 Playground Writing Complete! You earned a star! ⭐
+  </div>
+</section>
+
+<!-- ===== FINAL QUIZ SCREEN ===== -->
+<section id="screen-finalquiz" class="screen hidden">
+  <div class="screen-header">
+    <button class="btn-back" onclick="showScreen('screen-menu')">← Back</button>
+    <h2>🏆 Final Quiz — Test Your English!</h2>
+  </div>
+
+  <div id="final-quiz-locked" class="content-card hidden">
+    <div class="lock-message">
+      <div class="lock-icon">🔒</div>
+      <h3>Quiz Already Submitted!</h3>
+      <p>You have already taken the final quiz. Ask your teacher to reset it if needed.</p>
+      <div id="final-quiz-locked-score"></div>
+    </div>
+  </div>
+
+  <div id="final-quiz-content">
+    <div class="content-card quiz-intro">
+      <p>🎯 <strong>20 questions</strong> covering everything you've learned!</p>
+      <p>⚠️ <strong>This quiz can only be submitted ONCE.</strong> / Este examen solo se puede enviar UNA VEZ.</p>
+      <p>Good luck! / ¡Buena suerte! 🍀</p>
+    </div>
+    <div id="final-quiz-questions"></div>
+    <button class="btn-primary btn-large" onclick="submitFinalQuiz()" id="final-quiz-submit-btn">🏆 Submit Final Quiz!</button>
+  </div>
+
+  <div id="final-quiz-results" class="hidden">
+    <div class="quiz-results-card">
+      <h2>🎊 Quiz Complete!</h2>
+      <div class="score-display" id="final-score-display"></div>
+      <div id="final-breakdown"></div>
+      <div id="study-suggestions"></div>
+      <div id="teacher-reset-section" class="hidden">
+        <button class="btn-warning" onclick="teacherResetQuiz()">🔄 Teacher: Reset Quiz</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast" class="toast hidden" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
