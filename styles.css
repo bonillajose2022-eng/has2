@@ -925,7 +925,23 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
   .card-icon { font-size: 1.8rem; }
 }
 
-/* --- Focus visible for keyboard users --- */
+/* Video tab switcher */
+.video-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.video-tab-btn {
+  background: var(--blue-light);
+  color: var(--blue-dark);
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.video-tab-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+.video-tab-btn:hover { border-color: var(--blue); }
+
+/* Video tab switcher */
 a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid var(--yellow);
   outline-offset: 2px;
